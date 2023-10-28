@@ -6,6 +6,7 @@
 # ------------------------------------------------------------------------------------ #
 
 import argparse
+import tqdm
 from TableProcess import import_merge_data, export_combined_data
 
 def main():
@@ -28,8 +29,10 @@ def main():
 
     # Import some pre-defined functions
     combined_data = import_merge_data(args.input_folder)
-    export_combined_data(combined_data, args.output_file)
-
+    # Export to new xlsx file
+    with tqdm(total=1) as pbar:
+       export_combined_data(combined_data, args.output_file)
+       pbar.update(1)
     print(f"Exported data to: {args.output_file}")
 
 if __name__ == '__main__':
