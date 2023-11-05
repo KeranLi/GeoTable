@@ -39,19 +39,36 @@ def save_map(fig, filename):
 
 # 主程序逻辑
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', required=True, help='input data file')
     parser.add_argument('-o', '--output', required=True, help='output image file')
+    
+    # 添加更多参数
+    parser.add_argument('-r', '--relief', default='earth', choices=['earth', 'moon'], help='background relief')
+    parser.add_argument('-c', '--cmap', default='geo', help='color map for relief')
+    
+    parser.add_argument('-s', '--size', default=0.5, type=float, help='point size')
+    parser.add_argument('-col', '--color', default='red', help='point color')
+    parser.add_argument('-p', '--pen', default='black', help='point edge color')
+    
+    parser.add_argument('-cb', '--colorbar', action='store_true', help='add colorbar')
+    
     args = parser.parse_args()
 
-    lat, lon = load_data(args.input) 
-    region = [70, 140, 0, 55]
+    lat, lon = load_data(args.input)
     
-    fig = create_basemap(region)
+    # 使用参数设置区域范围
+    region = [70, 140, 0, 55] 
+    
+    fig = create_basemap(region, args.relief, args.cmap)
 
-    # 用tqdm显示循环进度
     for _ in tqdm(range(10)):
-        plot_points(fig, lon, lat) 
+        # 使用参数设置点的样式
+        plot_points(fig, lon, lat, args.size, args.color, args.pen)
 
-    add_features(fig, region)
+    # 根据参数决定是否添加colorbar
+    if args.colorbar:
+        add_features(fig)
+        
     save_map(fig, args.output)
