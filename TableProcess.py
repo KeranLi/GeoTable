@@ -8,8 +8,10 @@ import os
 import pandas as pd
 from tqdm import tqdm
 import time
+import dask.dataframe as dd
+import dask.diagnostics
 
-def import_merge_data(folder_path):
+def import_merge_data_pd(folder_path):
 
     # Set up a new df to store data
     combined_data = pd.DataFrame()
@@ -31,6 +33,32 @@ def import_merge_data(folder_path):
     print(f"Total time taken: {total_time} seconds")
     return combined_data
 
-def export_combined_data(combined_data, output_path):
+def export_combined_data_pd(combined_data, output_path):
+    combined_data.to_excel(output_path, index=False)
+    print("Excel files merged and exported successfully.")
+
+def import_merge_data_dk(folder_path):
+    # Set up a new df to store data
+    combined_data = dd.DataFrame()
+
+    # Calculate the running time/Gain the start time point
+    start_time = time.time()
+
+    # Loops all excel files in the folder
+    for filename in tqdm(os.listdir(folder_path), desc="Merging Excel Files"):
+        if filename.endswith('.xlsx'): # Make sure all files are .xlsx type
+            file_path = os.path.join(folder_path, filename) # Build full direction
+            df = dd.read_excel(file_path) # Load data
+            combined_data = dd.concat([combined_data, df], ignore_index=True) # Merge data
+
+    # Calculate the running time/Gain the end time point
+    end_time = time.time()
+    # Calculate the running time/Gain the total time
+    total_time = end_time - start_time
+    # Print the total time
+    print(f"Total time taken: {total_time} seconds")
+    return combined_data
+
+def export_combined_data_dk(combined_data, output_path):
     combined_data.to_excel(output_path, index=False)
     print("Excel files merged and exported successfully.")
